@@ -14,7 +14,7 @@ const Payment = require("../model/payment");
 const utils = require("./utils");
 const { sendEmail } = require("./../utils/emails");
 const fs = require('fs')
-const data = require("../../CLIENT/src/data.json")
+const data = require("../data.json")
 const stripe = require("stripe")("sk_test_51N5Xu5CzvYhWZpaqx5A2vrhy2IHiZT3v81ucdy6imM4rru2nJC8UOOMTQvOpCSukGWhCBelr4g1wkIRTBY81gsDp00ebYHqsqG")
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
