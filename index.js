@@ -4,7 +4,7 @@ const app = express();
 const http = require("http").Server(app);
 const cors = require("cors"); // added
 const connectDB = require("./config/keys.js");
-const middleware = require("../CLIENT/middleware/auth.js");
+const middleware = require("./middleware/auth.js");
 
 const users = require("./routes/user.js");
 const products = require("./routes/product.js")
