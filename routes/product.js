@@ -708,6 +708,9 @@ router.route("/seller-fields").get(async (req, res) => {
         $project: {
           name: 1,
           email: 1,
+          phone: "$joinedCollection1.mobile",
+          city: "$joinedCollection1.city",
+          country: "$joinedCollection1.country"
         },
       },
     ]);

@@ -27,17 +27,13 @@ let upload = multer({ storage, fileFilter });
 router
   .route("/edit-user-profile")
   .put(upload.single("photo"), async (req, res) => {
-    console.log('req.body', req.body)
-    console.log('req.decoded routes', req.decoded)
     const { getUserId } = req.decoded
     console.log('getUserId', getUserId)
 
     if (req.file) {
-      console.log("if")
       var photo = req.file.filename;
     }
     else {
-      console.log("else")
       photo = req.body.photo === "undefined" ? "" : req.body.photo
     }
 
@@ -70,18 +66,30 @@ router
       }
     }
     console.log("nonEmptyFields", nonEmptyFields)
+    const userProfile = await UserProfile.findOne({ userId: getUserId });
 
-    UserProfile.updateMany({ userId: getUserId }, { $set: nonEmptyFields }, { multi: true }, (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Not updated" });
-      }
-      if (result.nModified === 0) {
-        return res.status(404).json({ message: "No documents found to update" });
-      }
-      console.log('result', result)
-      res.status(200).json({ data: obj })
+    if (!userProfile) {
+        const newProfile = new UserProfile({ userId: getUserId, ...nonEmptyFields });
+        await newProfile.save();
+        return res.status(201).json({ message: "Profile created", data: newProfile });
+    }
 
-    });
+    const result = await UserProfile.updateOne({ userId: getUserId }, { $set: nonEmptyFields });
+
+    if (result.modifiedCount === 0) {
+        return res.status(404).json({ message: "No changes made" });
+    }
+    // UserProfile.updateMany({ userId: getUserId }, { $set: nonEmptyFields }, { multi: true }, (err, result) => {
+    //   if (err) {
+    //     console.error(err);
+    //     return res.status(500).json({ message: "Not updated" });
+    //   }
+    //   if (result.nModified === 0) {
+    //     return res.status(404).json({ message: "No documents found to update" });
+    //   }
+    //   console.log('result', result)
+       res.status(200).json({ data: obj })
+
+    // });
   });
 module.exports = router;
