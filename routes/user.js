@@ -24,9 +24,7 @@ router.route("/sign-up").post(async (req, res) => {
 
   let password = req.body.password;
   console.log("password is", password);
-  const isUserExist = await user.findOne({
-    email: email,
-  });
+  const isUserExist = await user.findOne({ where: { name, email } });
   console.log("isUserExist is", isUserExist);
   if (isUserExist) {
     return res.status(400).json({ message: "Email already exist" });
