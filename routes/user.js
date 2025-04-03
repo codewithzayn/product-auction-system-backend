@@ -108,11 +108,46 @@ router
     console.log('getUserId get buyer reviews', getUserId)
     console.log('req.decoded', req.decoded)
     try {
-        let getBuyerData = await user.find(
-            { _id: getUserId},
-        );
-        console.log('getBuyerData', getBuyerData)
-        res.status(200).json(getBuyerData);
+        // let getBuyerData = await user.find(
+        //     { _id: getUserId},
+        // );
+
+        try {
+          let getBuyerData = await user.aggregate([
+            {
+              $match: {
+                _id: mongoose.Types.ObjectId(getUserId),
+              },
+            },
+            {
+              $lookup: {
+                from: "userprofiles",
+                localField: "_id",
+                foreignField: "userId",
+                as: "joinedCollection1",
+              },
+            },
+            {
+              $unwind: {
+                path: "$joinedCollection1",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $project: {
+                name: 1,
+                email: 1,
+                phone: "$joinedCollection1.mobile",
+                city: "$joinedCollection1.city",
+                country: "$joinedCollection1.country"
+              },
+            },
+          ]);
+          console.log("result seller-fields.", getBuyerData);
+          res.status(200).json(getBuyerData);
+        } catch (error) {
+          console.log("error", error);
+        }
     } catch (error) {
         console.log("error", error);
     }
